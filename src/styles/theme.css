@@ -1,113 +1,98 @@
 /*
- * Tema dual dark/light.
+ * Tema dual light/dark del storefront Lumière.
  *
- * - Default (`:root` y `.dark`) usa los colores actuales del backoffice (dark).
- *   Cuando llegue el código generado por Figma, REEMPLAZÁ los valores dentro de
- *   la sección `.light` con la paleta correcta del Figma. La estructura de
- *   tokens (--background, --foreground, --primary, etc.) se mantiene igual —
- *   solo cambian los colores.
- * - Por ahora `:root` es dark (el `<html class="dark">` en index.html lo activa
- *   también, redundante pero explícito).
+ * - Default (`:root`) usa la paleta cálida tierra/coral del Figma.
+ *   Cormorant Garamond para display (serif elegante) + Outfit para body.
+ * - `.dark` usa la paleta neutra oklch del Figma (negros profundos).
  *
- * Cuando hagamos el toggle de tema, pasamos a `:root` = light defaults y
- * `.dark` overrides como es la convención típica de shadcn.
+ * El toggle dark/light se va a implementar más adelante con un store + class
+ * en `<html>`. Por ahora `<html>` sin clase = light por default.
  */
 
 @custom-variant dark (&:is(.dark *));
 
-:root,
-.dark {
+:root {
   --font-size: 16px;
-  --font-display: 'Outfit', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Outfit', sans-serif;
 
-  /* Dark theme base */
-  --background: #0a0b0f;
-  --foreground: #e8eaed;
-  --card: #13151a;
-  --card-foreground: #e8eaed;
-  --popover: #13151a;
-  --popover-foreground: #e8eaed;
+  /* Light theme — Lumière warm palette (default) */
+  --background: #fdfaf7;
+  --foreground: #1a1412;
+  --card: #ffffff;
+  --card-foreground: #1a1412;
+  --popover: #ffffff;
+  --popover-foreground: #1a1412;
 
-  /* Accent teal/emerald */
-  --primary: #00d9a3;
-  --primary-foreground: #0a0b0f;
-  --secondary: #1a1d24;
-  --secondary-foreground: #e8eaed;
-  --muted: #1f2229;
-  --muted-foreground: #8b8d98;
-  --accent: #00d9a3;
-  --accent-foreground: #0a0b0f;
+  --primary: #c65d3b;
+  --primary-foreground: #ffffff;
+  --secondary: #e8ddd4;
+  --secondary-foreground: #1a1412;
+  --muted: #f4ede7;
+  --muted-foreground: #7a6f65;
+  --accent: #d97757;
+  --accent-foreground: #ffffff;
 
-  /* Destructive */
-  --destructive: #ff4757;
+  --destructive: #c4374e;
   --destructive-foreground: #ffffff;
 
-  /* Borders and inputs */
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.05);
-  --input-background: #1a1d24;
-  --switch-background: #2a2d34;
-  --ring: #00d9a3;
+  --border: rgba(198, 93, 59, 0.1);
+  --input: transparent;
+  --input-background: #f9f4f0;
+  --switch-background: #d4c4b8;
+  --ring: #c65d3b;
 
-  /* Status colors */
-  --success: #00d9a3;
-  --warning: #ffa502;
-  --info: #3b82f6;
+  --success: #2e9b6f;
+  --warning: #d97706;
+  --info: #2563eb;
 
-  /* Font weights */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
 
-  /* Charts */
-  --chart-1: #00d9a3;
-  --chart-2: #3b82f6;
-  --chart-3: #a855f7;
-  --chart-4: #f59e0b;
-  --chart-5: #ef4444;
+  --chart-1: #c65d3b;
+  --chart-2: #d97757;
+  --chart-3: #8b7355;
+  --chart-4: #e8ddd4;
+  --chart-5: #b89080;
 
-  --radius: 0.5rem;
+  --radius: 0.25rem;
 }
 
-/*
- * PLACEHOLDER LIGHT THEME — actualmente usa los mismos valores que dark.
- * Reemplazar todos los colores cuando llegue el código del Figma.
- */
-.light {
-  --background: #0a0b0f;
-  --foreground: #e8eaed;
-  --card: #13151a;
-  --card-foreground: #e8eaed;
-  --popover: #13151a;
-  --popover-foreground: #e8eaed;
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
 
-  --primary: #00d9a3;
-  --primary-foreground: #0a0b0f;
-  --secondary: #1a1d24;
-  --secondary-foreground: #e8eaed;
-  --muted: #1f2229;
-  --muted-foreground: #8b8d98;
-  --accent: #00d9a3;
-  --accent-foreground: #0a0b0f;
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
 
-  --destructive: #ff4757;
-  --destructive-foreground: #ffffff;
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
 
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.05);
-  --input-background: #1a1d24;
-  --switch-background: #2a2d34;
-  --ring: #00d9a3;
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --input-background: oklch(0.205 0 0);
+  --switch-background: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
 
-  --success: #00d9a3;
-  --warning: #ffa502;
-  --info: #3b82f6;
+  --success: oklch(0.696 0.17 162.48);
+  --warning: oklch(0.769 0.188 70.08);
+  --info: oklch(0.488 0.243 264.376);
 
-  --chart-1: #00d9a3;
-  --chart-2: #3b82f6;
-  --chart-3: #a855f7;
-  --chart-4: #f59e0b;
-  --chart-5: #ef4444;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
 }
 
 @theme inline {
@@ -156,6 +141,14 @@
     font-family: var(--font-body);
   }
 
+  /*
+   * Default typography styles for HTML elements (h1-h4, p, label, button, input).
+   * Tailwind utility classes (text-sm, text-lg, etc.) override these automatically.
+   */
+  html {
+    font-size: var(--font-size);
+  }
+
   h1,
   h2,
   h3,
@@ -163,10 +156,6 @@
   h5,
   h6 {
     font-family: var(--font-display);
-  }
-
-  html {
-    font-size: var(--font-size);
   }
 
   h1 {

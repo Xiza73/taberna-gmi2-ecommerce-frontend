@@ -1,8 +1,13 @@
-# Ecommerce Frontend — Storefront GMI2
+# Ecommerce Frontend — Storefront GMI2 (brand: Lumière)
 
 > Este `CLAUDE.md` **extiende** las reglas compartidas en `../CLAUDE.md` (raíz del workspace)
 > y `../docs/FRONTEND-CONVENTIONS.md` + `../docs/API-CONTRACT.md`. Leer primero la raíz.
 > Acá sólo van overrides y cosas específicas del storefront.
+
+> **Nombre técnico del repo / paquete**: `ecommerce-frontend`. **Brand visible al usuario
+> final**: "Lumière" (ecommerce de moda/lifestyle, "estilo atemporal y calidad excepcional").
+> El nombre técnico no cambia para mantener consistencia con `backoffice-frontend` /
+> `pos-frontend`.
 
 ---
 
@@ -78,11 +83,16 @@ Ejemplos:
 
 ## Theming
 
-- Tema dual dark/light en `src/styles/theme.css`. Default: `<html class="dark">`.
-- Cuando llegue el código de Figma, reemplazar **solo los valores hex** dentro de la
-  sección `.light` — la estructura de tokens se mantiene.
-- Toggle de dark/light se implementa más adelante con un store simple + `class` toggle
-  en `<html>`.
+- Tema dual light/dark en `src/styles/theme.css`. **Default: light** (paleta cálida
+  tierra/coral del Figma de Lumière).
+- `:root` = light (warm: bg `#fdfaf7`, fg `#1a1412`, primary `#c65d3b`, accent `#d97757`,
+  font display `Cormorant Garamond` serif, font body `Outfit`).
+- `.dark` = paleta oklch neutra (negros profundos), también del Figma. Se activa
+  con `<html class="dark">`.
+- Toggle dark/light se implementa más adelante con un store simple + `class` toggle
+  en `<html>`. Por ahora `<html>` sin clase = light.
+- Border radius pequeño (`0.25rem`), container max width 1400px (visto en Figma
+  como `max-w-[1400px]`).
 
 ---
 

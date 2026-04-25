@@ -25,7 +25,7 @@ export function RootLayout() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Outlet />
-      <Toaster theme="dark" position="top-right" richColors closeButton />
+      <Toaster position="top-right" richColors closeButton />
     </div>
   );
 }
