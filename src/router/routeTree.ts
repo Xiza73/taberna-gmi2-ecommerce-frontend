@@ -9,6 +9,8 @@ import { PublicAuthLayout } from '@/layouts/PublicAuthLayout';
 import { HomePage } from '@/pages/HomePage';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
+import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
 import { authKeys } from '@/features/auth';
 
 interface RouterContext {
@@ -58,7 +60,26 @@ const registerRoute = createRoute({
   component: RegisterPage,
 });
 
+const forgotPasswordRoute = createRoute({
+  getParentRoute: () => publicAuthLayoutRoute,
+  path: '/forgot-password',
+  component: ForgotPasswordPage,
+});
+
+// `/reset-password?token=customerId.rawToken` — el token viene del email
+// generado por el back. Lo leemos desde `useLocation().searchStr` en la page.
+const resetPasswordRoute = createRoute({
+  getParentRoute: () => publicAuthLayoutRoute,
+  path: '/reset-password',
+  component: ResetPasswordPage,
+});
+
 export const routeTree = rootRoute.addChildren([
   homeRoute,
-  publicAuthLayoutRoute.addChildren([loginRoute, registerRoute]),
+  publicAuthLayoutRoute.addChildren([
+    loginRoute,
+    registerRoute,
+    forgotPasswordRoute,
+    resetPasswordRoute,
+  ]),
 ]);
