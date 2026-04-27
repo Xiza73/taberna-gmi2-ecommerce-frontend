@@ -1,5 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { RegisterForm } from '@/features/auth';
+import { GoogleSignInButton, RegisterForm } from '@/features/auth';
+import { Divider } from '@/components/ui/Divider';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -23,6 +24,13 @@ export function RegisterPage() {
       </header>
 
       <RegisterForm onSuccess={handleSuccess} />
+
+      <Divider label="o" className="my-5" />
+
+      <GoogleSignInButton
+        onSuccess={handleSuccess}
+        loadingLabel="Verificando con Google…"
+      />
 
       <p className="mt-6 text-sm text-muted-foreground text-center">
         ¿Ya tenés cuenta?{' '}

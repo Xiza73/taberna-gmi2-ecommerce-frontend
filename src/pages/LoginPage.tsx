@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
-import { LoginForm } from '@/features/auth';
+import { GoogleSignInButton, LoginForm } from '@/features/auth';
+import { Divider } from '@/components/ui/Divider';
 
 function parseRedirect(searchStr: string): string {
   const params = new URLSearchParams(searchStr);
@@ -33,6 +34,13 @@ export function LoginPage() {
       </header>
 
       <LoginForm onSuccess={handleSuccess} />
+
+      <Divider label="o" className="my-5" />
+
+      <GoogleSignInButton
+        onSuccess={handleSuccess}
+        loadingLabel="Verificando con Google…"
+      />
 
       <p className="mt-6 text-sm text-muted-foreground text-center">
         ¿Aún no tenés cuenta?{' '}
