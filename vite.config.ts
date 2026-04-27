@@ -11,9 +11,13 @@ export default defineConfig({
     },
   },
   server: {
-    // 5174 = backoffice, 5175 = ecommerce. Mantenemos el offset para poder
-    // correr ambos fronts a la vez sin colisiones.
-    port: 5175,
+    // Convención de puertos del workspace (definida en `backend/.env`):
+    //   5173 = ecommerce  (este front)
+    //   5174 = backoffice
+    //   5175 = pos (futuro)
+    // El back arma los links de email (`ECOMMERCE_URL`) asumiendo 5173,
+    // así que dejamos `strictPort: true` para no caer a otro puerto.
+    port: 5173,
     strictPort: true,
     proxy: {
       '/api': {

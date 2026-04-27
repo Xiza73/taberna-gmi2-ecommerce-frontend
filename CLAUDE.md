@@ -44,7 +44,7 @@ blog, multi-idioma, SSR.
 ## Comandos del proyecto
 
 ```bash
-pnpm dev               # Vite dev server con HMR (puerto 5175)
+pnpm dev               # Vite dev server con HMR (puerto 5173)
 pnpm build             # tsc -b && vite build (producción)
 pnpm preview           # Preview del build
 pnpm test              # Vitest watch
@@ -55,7 +55,7 @@ pnpm format            # Prettier --write
 pnpm typecheck         # tsc --noEmit
 ```
 
-**Puerto del dev server**: 5175 (con `strictPort: true`). El backoffice está en 5174.
+**Puerto del dev server**: 5173 (con `strictPort: true`). El backoffice está en 5174.
 Eso permite correr ambos fronts a la vez sin colisiones.
 
 ---
