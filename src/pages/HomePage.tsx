@@ -1,14 +1,14 @@
 import { Sparkles } from 'lucide-react';
 
 /**
- * Homepage placeholder. Va a ser reemplazada por la home real (header sticky,
- * banner carousel, features section, products grid, newsletter, footer)
- * cuando lleguen los PRs de layout/home/catálogo.
+ * Homepage placeholder. Vive dentro del `MainLayout` (header + footer).
+ * Se reemplaza por la home real (banner carousel, features section,
+ * products grid, newsletter) en PRs siguientes.
  */
 export function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6">
-      <div className="max-w-md text-center space-y-6">
+    <main className="mx-auto max-w-[1400px] px-4 lg:px-8 py-16 lg:py-24">
+      <div className="max-w-md mx-auto text-center space-y-6">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
           <Sparkles size={28} className="text-primary" />
         </div>
@@ -24,11 +24,8 @@ export function HomePage() {
           </p>
         </div>
         <p className="text-base text-muted-foreground leading-relaxed">
-          Storefront listo para arrancar. Las features (auth, catálogo, carrito,
-          checkout, mi cuenta) entran en PRs siguientes.
-        </p>
-        <p className="text-xs text-muted-foreground/70">
-          Bootstrap inicial — React 19 · Vite · Tailwind 4 · TanStack Query/Router
+          Las features de catálogo, carrito, checkout y mi cuenta entran en
+          los PRs siguientes.
         </p>
       </div>
     </main>
