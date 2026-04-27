@@ -35,6 +35,15 @@ export function LoginPage() {
 
       <LoginForm onSuccess={handleSuccess} />
 
+      <p className="mt-3 text-sm text-right">
+        <Link
+          to="/forgot-password"
+          className="text-muted-foreground hover:text-primary hover:underline underline-offset-4"
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </p>
+
       <Divider label="o" className="my-5" />
 
       <GoogleSignInButton
