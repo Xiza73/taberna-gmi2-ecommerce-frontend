@@ -13,7 +13,7 @@ import {
   User,
   X,
 } from 'lucide-react';
-import { useAuth } from '@/features/auth';
+import { buildLoginSearch, useAuth } from '@/features/auth';
 import { useCart, useCartUiStore } from '@/features/cart';
 import { buildProductsSearch, useCategories } from '@/features/catalog';
 import { cn } from '@/utils/cn';
@@ -261,6 +261,7 @@ function UserMenu() {
     return (
       <Link
         to="/login"
+        search={buildLoginSearch()}
         aria-label="Iniciar sesión"
         className="p-2 rounded-full text-foreground/70 hover:bg-muted hover:text-foreground transition-colors"
       >
@@ -307,7 +308,7 @@ function UserMenu() {
               <UserMenuItem
                 icon={<User size={16} />}
                 label="Mi cuenta"
-                disabled
+                to="/account"
                 onClick={() => setIsOpen(false)}
               />
               <UserMenuItem
@@ -348,21 +349,34 @@ function UserMenu() {
 interface UserMenuItemProps {
   icon: React.ReactNode;
   label: string;
+  /** Si se pasa, renderiza como `<Link>` en lugar de `<button>`. */
+  to?: string;
   disabled?: boolean;
   onClick?: () => void;
 }
 
-function UserMenuItem({ icon, label, disabled, onClick }: UserMenuItemProps) {
+function UserMenuItem({ icon, label, to, disabled, onClick }: UserMenuItemProps) {
+  const className = cn(
+    'w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground/80 hover:bg-muted transition-colors',
+    disabled && 'opacity-60 cursor-not-allowed hover:bg-transparent',
+  );
+
+  if (to && !disabled) {
+    return (
+      <Link to={to} role="menuitem" onClick={onClick} className={className}>
+        {icon}
+        <span>{label}</span>
+      </Link>
+    );
+  }
+
   return (
     <button
       type="button"
       role="menuitem"
       disabled={disabled}
       onClick={onClick}
-      className={cn(
-        'w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground/80 hover:bg-muted transition-colors',
-        disabled && 'opacity-60 cursor-not-allowed hover:bg-transparent',
-      )}
+      className={className}
     >
       {icon}
       <span>{label}</span>

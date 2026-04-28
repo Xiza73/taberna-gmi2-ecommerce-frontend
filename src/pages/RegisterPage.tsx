@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { GoogleSignInButton, RegisterForm } from '@/features/auth';
+import { buildLoginSearch, GoogleSignInButton, RegisterForm } from '@/features/auth';
 import { Divider } from '@/components/ui/Divider';
 
 export function RegisterPage() {
@@ -36,6 +36,7 @@ export function RegisterPage() {
         ¿Ya tenés cuenta?{' '}
         <Link
           to="/login"
+          search={buildLoginSearch()}
           className="text-primary hover:underline underline-offset-4"
         >
           Iniciá sesión
