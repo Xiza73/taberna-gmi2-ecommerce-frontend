@@ -16,3 +16,16 @@ export function useProducts(query: ProductsQuery) {
     staleTime: 60_000,
   });
 }
+
+/**
+ * Devuelve el producto por slug. `enabled: false` mientras `slug` es
+ * undefined (durante la primera render del param de la ruta).
+ */
+export function useProduct(slug: string | undefined) {
+  return useQuery({
+    queryKey: productsKeys.detail(slug ?? ''),
+    queryFn: () => productsApi.bySlug(slug as string),
+    enabled: Boolean(slug),
+    staleTime: 60_000,
+  });
+}
