@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth';
+import { buildProductsSearch, useCategories } from '@/features/catalog';
 import { cn } from '@/utils/cn';
 
 /**
@@ -21,20 +22,17 @@ import { cn } from '@/utils/cn';
  * en el centro (desktop), action icons a la derecha (search, user, wishlist,
  * cart). En mobile colapsa a un menú dropdown.
  *
- * Por ahora los nav items y search/wishlist son placeholders (`disabled`):
- * se enganchan en los PRs de catálogo / search / wishlist.
+ * Nav: usa las categorías top-level reales del back (`useCategories`),
+ * limitadas a las primeras `MAX_NAV_CATEGORIES`. Si todavía está cargando,
+ * no muestra nav (evita flash). Si vienen 0, no muestra nada.
  *
- * El badge del cart usa `cartItemCount` que por ahora viene siempre en 0;
- * se conectará cuando exista el feature de cart.
+ * Search y wishlist siguen siendo placeholders; se enganchan en sus PRs.
+ *
+ * El badge del cart usa `cartItemCount`; se conectará cuando exista el
+ * feature de cart.
  */
 
-const NAV_ITEMS = [
-  { label: 'Novedades' },
-  { label: 'Mujer' },
-  { label: 'Hombre' },
-  { label: 'Accesorios' },
-  { label: 'Ofertas' },
-] as const;
+const MAX_NAV_CATEGORIES = 5;
 
 interface Props {
   cartItemCount?: number;
@@ -42,6 +40,8 @@ interface Props {
 
 export function MainHeader({ cartItemCount = 0 }: Props) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { topLevel: categories, isLoading: isCategoriesLoading } = useCategories();
+  const navCategories = categories.slice(0, MAX_NAV_CATEGORIES);
 
   return (
     <>
@@ -75,9 +75,17 @@ export function MainHeader({ cartItemCount = 0 }: Props) {
 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-8">
-              {NAV_ITEMS.map((item) => (
-                <NavPlaceholder key={item.label}>{item.label}</NavPlaceholder>
-              ))}
+              {!isCategoriesLoading &&
+                navCategories.map((cat) => (
+                  <Link
+                    key={cat.id}
+                    to="/products"
+                    search={buildProductsSearch({ categoryId: cat.id })}
+                    className="text-sm tracking-wide text-foreground/70 hover:text-foreground transition-colors"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
             </nav>
 
             {/* Right actions */}
@@ -128,16 +136,26 @@ export function MainHeader({ cartItemCount = 0 }: Props) {
           >
             <div className="px-4 py-6 space-y-6">
               <nav className="flex flex-col gap-1">
-                {NAV_ITEMS.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    disabled
-                    className="text-left px-3 py-2.5 rounded-md text-base text-foreground/70 disabled:cursor-not-allowed"
-                  >
-                    {item.label}
-                  </button>
-                ))}
+                <Link
+                  to="/products"
+                  search={buildProductsSearch()}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-3 py-2.5 rounded-md text-base text-foreground/70 hover:text-foreground hover:bg-muted transition-colors"
+                >
+                  Todos los productos
+                </Link>
+                {!isCategoriesLoading &&
+                  navCategories.map((cat) => (
+                    <Link
+                      key={cat.id}
+                      to="/products"
+                      search={buildProductsSearch({ categoryId: cat.id })}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="px-3 py-2.5 rounded-md text-base text-foreground/70 hover:text-foreground hover:bg-muted transition-colors"
+                    >
+                      {cat.name}
+                    </Link>
+                  ))}
               </nav>
 
               <div className="border-t border-border pt-4">
@@ -165,18 +183,6 @@ export function MainHeader({ cartItemCount = 0 }: Props) {
         )}
       </AnimatePresence>
     </>
-  );
-}
-
-function NavPlaceholder({ children }: { children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      disabled
-      className="text-sm tracking-wide text-foreground/70 hover:text-foreground transition-colors disabled:cursor-not-allowed"
-    >
-      {children}
-    </button>
   );
 }
 
