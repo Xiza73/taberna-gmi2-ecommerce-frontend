@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth';
+import { useCart, useCartUiStore } from '@/features/cart';
 import { buildProductsSearch, useCategories } from '@/features/catalog';
 import { cn } from '@/utils/cn';
 
@@ -28,20 +29,18 @@ import { cn } from '@/utils/cn';
  *
  * Search y wishlist siguen siendo placeholders; se enganchan en sus PRs.
  *
- * El badge del cart usa `cartItemCount`; se conectará cuando exista el
- * feature de cart.
+ * Cart icon abre el `CartDrawer` (mounted en `RootLayout`) y muestra el
+ * badge con el count del cart actual (anonymous + server según sesión).
  */
 
 const MAX_NAV_CATEGORIES = 5;
 
-interface Props {
-  cartItemCount?: number;
-}
-
-export function MainHeader({ cartItemCount = 0 }: Props) {
+export function MainHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { topLevel: categories, isLoading: isCategoriesLoading } = useCategories();
   const navCategories = categories.slice(0, MAX_NAV_CATEGORIES);
+  const { itemCount } = useCart();
+  const openCart = useCartUiStore((s) => s.openDrawer);
 
   return (
     <>
@@ -101,11 +100,19 @@ export function MainHeader({ cartItemCount = 0 }: Props) {
                 label="Favoritos"
                 className="hidden md:inline-flex"
               />
-              <IconActionPlaceholder
-                icon={<ShoppingCart size={20} />}
-                label="Carrito"
-                badge={cartItemCount > 0 ? cartItemCount : undefined}
-              />
+              <button
+                type="button"
+                onClick={openCart}
+                aria-label="Carrito"
+                className="relative p-2 rounded-full text-foreground/70 hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <ShoppingCart size={20} />
+                {itemCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
+              </button>
 
               <button
                 type="button"
