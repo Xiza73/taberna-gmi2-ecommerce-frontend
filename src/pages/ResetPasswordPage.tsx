@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { AlertTriangle } from 'lucide-react';
-import { ResetPasswordForm } from '@/features/auth';
+import { buildLoginSearch, ResetPasswordForm } from '@/features/auth';
 
 function parseToken(searchStr: string): string | null {
   const params = new URLSearchParams(searchStr);
@@ -20,7 +20,7 @@ export function ResetPasswordPage() {
 
   function handleSuccess() {
     toast.success('Contraseña actualizada. Iniciá sesión con la nueva.');
-    void navigate({ to: '/login' });
+    void navigate({ to: '/login', search: buildLoginSearch() });
   }
 
   if (!token) {

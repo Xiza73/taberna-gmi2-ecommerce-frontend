@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
-import { ForgotPasswordForm } from '@/features/auth';
+import { buildLoginSearch, ForgotPasswordForm } from '@/features/auth';
 
 export function ForgotPasswordPage() {
   const [sentToEmail, setSentToEmail] = useState<string | null>(null);
@@ -29,6 +29,7 @@ export function ForgotPasswordPage() {
 
         <Link
           to="/login"
+          search={buildLoginSearch()}
           className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline underline-offset-4"
         >
           <ArrowLeft size={14} />
@@ -57,6 +58,7 @@ export function ForgotPasswordPage() {
       <p className="mt-6 text-sm text-muted-foreground text-center">
         <Link
           to="/login"
+          search={buildLoginSearch()}
           className="inline-flex items-center gap-1.5 text-primary hover:underline underline-offset-4"
         >
           <ArrowLeft size={14} />

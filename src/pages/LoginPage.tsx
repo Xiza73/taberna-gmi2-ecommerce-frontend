@@ -16,7 +16,9 @@ export function LoginPage() {
   const redirectTo = parseRedirect(location.searchStr);
 
   function handleSuccess() {
-    void navigate({ to: redirectTo });
+    // `redirectTo` es runtime-derived; usamos `href` (raw URL) en lugar de
+    // `to` para no pelear con los types estrictos del router.
+    void navigate({ href: redirectTo });
   }
 
   return (

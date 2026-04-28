@@ -7,6 +7,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { RootLayout } from '@/layouts/RootLayout';
 import { MainLayout } from '@/layouts/MainLayout';
 import { PublicAuthLayout } from '@/layouts/PublicAuthLayout';
+import { AccountLayout } from '@/layouts/AccountLayout';
 import { HomePage } from '@/pages/HomePage';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
@@ -14,7 +15,9 @@ import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
 import { ProductsListPage } from '@/pages/ProductsListPage';
 import { ProductDetailPage } from '@/pages/ProductDetailPage';
+import { AccountAddressesPage } from '@/pages/AccountAddressesPage';
 import { authKeys } from '@/features/auth';
+import { customerAuthApi } from '@/api/customerAuthApi';
 import type { ProductSortBy } from '@/types/product';
 
 const VALID_PRODUCT_SORT: ProductSortBy[] = [
@@ -80,6 +83,48 @@ const productDetailRoute = createRoute({
   component: ProductDetailPage,
 });
 
+// --- Account section (/account/*) — auth required ---
+//
+// Pathless layout (id: 'accountLayout') que envuelve todas las rutas /account/*.
+// Su `beforeLoad` exige sesión activa: si no hay /me cacheado, intenta
+// cargarlo (puede disparar /me); si falla, redirige a /login con
+// `?redirect=` apuntando al destino original para volver tras el login.
+const accountLayoutRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  id: 'accountLayout',
+  component: AccountLayout,
+  beforeLoad: async ({ context, location }) => {
+    try {
+      await context.queryClient.ensureQueryData({
+        queryKey: authKeys.me,
+        queryFn: customerAuthApi.me,
+        staleTime: 30_000,
+      });
+    } catch {
+      throw redirect({
+        to: '/login',
+        search: { redirect: location.href },
+      });
+    }
+  },
+});
+
+// `/account` no tiene página propia — redirige a la primera sub-sección
+// disponible (hoy: addresses).
+const accountIndexRoute = createRoute({
+  getParentRoute: () => accountLayoutRoute,
+  path: '/account',
+  beforeLoad: () => {
+    throw redirect({ to: '/account/addresses' });
+  },
+});
+
+const accountAddressesRoute = createRoute({
+  getParentRoute: () => accountLayoutRoute,
+  path: '/account/addresses',
+  component: AccountAddressesPage,
+});
+
 // --- Public auth pages (login/register/forgot/reset) — redirect to home if already authed ---
 //
 // El `beforeLoad` solo redirige si ya hay /me cacheado (sesión activa). No
@@ -98,6 +143,13 @@ const loginRoute = createRoute({
   getParentRoute: () => publicAuthLayoutRoute,
   path: '/login',
   component: LoginPage,
+  // `?redirect=` se sigue parseando manualmente en `LoginPage` con
+  // `useLocation().searchStr` (anti open-redirect + parser propio). El
+  // `validateSearch` está acá solo para que `redirect({ to: '/login',
+  // search: { redirect } })` desde otros guards typechequee.
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === 'string' ? search.redirect : undefined,
+  }),
 });
 
 const registerRoute = createRoute({
@@ -121,7 +173,12 @@ const resetPasswordRoute = createRoute({
 });
 
 export const routeTree = rootRoute.addChildren([
-  mainLayoutRoute.addChildren([homeRoute, productsListRoute, productDetailRoute]),
+  mainLayoutRoute.addChildren([
+    homeRoute,
+    productsListRoute,
+    productDetailRoute,
+    accountLayoutRoute.addChildren([accountIndexRoute, accountAddressesRoute]),
+  ]),
   publicAuthLayoutRoute.addChildren([
     loginRoute,
     registerRoute,
