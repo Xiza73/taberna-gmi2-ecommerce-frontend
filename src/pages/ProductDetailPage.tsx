@@ -16,6 +16,7 @@ import {
   useCategories,
   useProduct,
 } from '@/features/catalog';
+import { useCart, useCartUiStore } from '@/features/cart';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
@@ -28,6 +29,9 @@ export function ProductDetailPage() {
   const { data: product, isLoading, isError, error } = useProduct(slug);
   const { data: categoriesData } = useCategories();
   const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
+  const { addItem } = useCart();
+  const openCart = useCartUiStore((s) => s.openDrawer);
 
   const categoriesById = useMemo(() => {
     const m = new Map<string, NonNullable<typeof categoriesData>[number]>();
@@ -49,12 +53,20 @@ export function ProductDetailPage() {
   const isOutOfStock = product.stock === 0;
   const discountPct = computeDiscount(product.price, product.compareAtPrice);
 
-  function handleAddToCart() {
-    // El feature real del cart entra en su PR; por ahora confirmamos
-    // visualmente que el botón funciona.
-    toast.success(
-      `${quantity > 1 ? `${quantity}x ` : ''}${product?.name ?? ''} agregado al carrito`,
-    );
+  async function handleAddToCart() {
+    if (!product) return;
+    setIsAdding(true);
+    try {
+      await addItem(product, quantity);
+      toast.success(
+        `${quantity > 1 ? `${quantity}x ` : ''}${product.name} agregado al carrito`,
+      );
+      openCart();
+    } catch {
+      // El hook ya muestra toast del error si fue server-side.
+    } finally {
+      setIsAdding(false);
+    }
   }
 
   return (
@@ -166,11 +178,16 @@ export function ProductDetailPage() {
                 size="lg"
                 width="full"
                 disabled={isOutOfStock}
-                onClick={handleAddToCart}
+                loading={isAdding}
+                onClick={() => void handleAddToCart()}
                 className="sm:flex-1"
               >
                 <ShoppingCart size={16} />
-                {isOutOfStock ? 'Sin stock' : 'Agregar al carrito'}
+                {isOutOfStock
+                  ? 'Sin stock'
+                  : isAdding
+                    ? 'Agregando…'
+                    : 'Agregar al carrito'}
               </Button>
               <Button
                 variant="outline"
