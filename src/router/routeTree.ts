@@ -12,7 +12,18 @@ import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
+import { ProductsListPage } from '@/pages/ProductsListPage';
+import { ProductDetailPage } from '@/pages/ProductDetailPage';
 import { authKeys } from '@/features/auth';
+import type { ProductSortBy } from '@/types/product';
+
+const VALID_PRODUCT_SORT: ProductSortBy[] = [
+  'newest',
+  'price',
+  'price_desc',
+  'name',
+  'rating',
+];
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -38,6 +49,35 @@ const homeRoute = createRoute({
   getParentRoute: () => mainLayoutRoute,
   path: '/',
   component: HomePage,
+});
+
+const productsListRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: '/products',
+  component: ProductsListPage,
+  validateSearch: (search: Record<string, unknown>) => {
+    const sortByRaw = search.sortBy;
+    const pageRaw = search.page;
+    return {
+      categoryId: typeof search.categoryId === 'string' ? search.categoryId : undefined,
+      search: typeof search.search === 'string' ? search.search : undefined,
+      sortBy:
+        typeof sortByRaw === 'string' &&
+        (VALID_PRODUCT_SORT as string[]).includes(sortByRaw)
+          ? (sortByRaw as ProductSortBy)
+          : undefined,
+      page:
+        typeof pageRaw === 'number' && pageRaw > 0
+          ? Math.floor(pageRaw)
+          : undefined,
+    };
+  },
+});
+
+const productDetailRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: '/products/$slug',
+  component: ProductDetailPage,
 });
 
 // --- Public auth pages (login/register/forgot/reset) — redirect to home if already authed ---
@@ -81,7 +121,7 @@ const resetPasswordRoute = createRoute({
 });
 
 export const routeTree = rootRoute.addChildren([
-  mainLayoutRoute.addChildren([homeRoute]),
+  mainLayoutRoute.addChildren([homeRoute, productsListRoute, productDetailRoute]),
   publicAuthLayoutRoute.addChildren([
     loginRoute,
     registerRoute,

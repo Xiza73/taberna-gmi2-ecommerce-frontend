@@ -1,9 +1,11 @@
+import { Link } from '@tanstack/react-router';
 import { Sparkles } from 'lucide-react';
+import { buildProductsSearch, useCategories } from '@/features/catalog';
 
 /**
  * Footer principal del storefront. 4 columnas en desktop, stack en mobile.
- * Todos los links son placeholders por ahora — se enganchan en sus PRs
- * correspondientes (legales, contacto, ayuda, etc.).
+ * - "Comprar" usa categorías top-level reales del back (vía useCategories).
+ * - "Ayuda" y "Empresa" siguen siendo placeholders hasta sus PRs.
  */
 
 interface FooterLink {
@@ -15,16 +17,7 @@ interface FooterSection {
   links: FooterLink[];
 }
 
-const SECTIONS: FooterSection[] = [
-  {
-    title: 'Comprar',
-    links: [
-      { label: 'Mujer' },
-      { label: 'Hombre' },
-      { label: 'Accesorios' },
-      { label: 'Ofertas' },
-    ],
-  },
+const STATIC_SECTIONS: FooterSection[] = [
   {
     title: 'Ayuda',
     links: [
@@ -45,8 +38,12 @@ const SECTIONS: FooterSection[] = [
   },
 ];
 
+const MAX_FOOTER_CATEGORIES = 5;
+
 export function MainFooter() {
   const year = new Date().getFullYear();
+  const { topLevel: categories } = useCategories();
+  const shopCategories = categories.slice(0, MAX_FOOTER_CATEGORIES);
 
   return (
     <footer className="border-t border-border bg-secondary/40 mt-16">
@@ -54,8 +51,8 @@ export function MainFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand column */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+            <Link to="/" className="inline-flex items-center gap-2 group">
+              <span className="w-9 h-9 rounded-full bg-primary flex items-center justify-center transition-transform group-hover:scale-105">
                 <Sparkles size={16} className="text-primary-foreground" />
               </span>
               <span
@@ -64,19 +61,45 @@ export function MainFooter() {
               >
                 Lumière
               </span>
-            </div>
+            </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
               Estilo atemporal y calidad excepcional para cada momento.
             </p>
           </div>
 
-          {/* Link columns */}
-          {SECTIONS.map((section) => (
+          {/* Comprar (dynamic from categories) */}
+          <div>
+            <h4 className="mb-3 text-foreground" style={{ fontWeight: 500 }}>
+              Comprar
+            </h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <Link
+                  to="/products"
+                  search={buildProductsSearch()}
+                  className="hover:text-foreground transition-colors"
+                >
+                  Todos los productos
+                </Link>
+              </li>
+              {shopCategories.map((cat) => (
+                <li key={cat.id}>
+                  <Link
+                    to="/products"
+                    search={buildProductsSearch({ categoryId: cat.id })}
+                    className="hover:text-foreground transition-colors"
+                  >
+                    {cat.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Static sections */}
+          {STATIC_SECTIONS.map((section) => (
             <div key={section.title}>
-              <h4
-                className="mb-3 text-foreground"
-                style={{ fontWeight: 500 }}
-              >
+              <h4 className="mb-3 text-foreground" style={{ fontWeight: 500 }}>
                 {section.title}
               </h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
