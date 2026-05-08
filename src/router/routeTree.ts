@@ -16,6 +16,11 @@ import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
 import { ProductsListPage } from '@/pages/ProductsListPage';
 import { ProductDetailPage } from '@/pages/ProductDetailPage';
 import { AccountAddressesPage } from '@/pages/AccountAddressesPage';
+import { CheckoutPage } from '@/pages/CheckoutPage';
+import { PaymentSuccessPage } from '@/pages/PaymentSuccessPage';
+import { PaymentPendingPage } from '@/pages/PaymentPendingPage';
+import { PaymentFailurePage } from '@/pages/PaymentFailurePage';
+import { PaymentManualPage } from '@/pages/PaymentManualPage';
 import { authKeys } from '@/features/auth';
 import { customerAuthApi } from '@/api/customerAuthApi';
 import type { ProductSortBy } from '@/types/product';
@@ -125,6 +130,65 @@ const accountAddressesRoute = createRoute({
   component: AccountAddressesPage,
 });
 
+// --- Checkout (auth required + cart no vacío validado en la page) ---
+//
+// Reusamos el mismo patrón del accountLayoutRoute: ensureQueryData(/me) y
+// redirige a /login con `?redirect=/checkout` si falla. La validación del
+// cart vacío se hace dentro del CheckoutPage (no en beforeLoad para
+// evitar la fricción de pegarle a /cart como side-effect del routing).
+const checkoutRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: '/checkout',
+  component: CheckoutPage,
+  beforeLoad: async ({ context, location }) => {
+    try {
+      await context.queryClient.ensureQueryData({
+        queryKey: authKeys.me,
+        queryFn: customerAuthApi.me,
+        staleTime: 30_000,
+      });
+    } catch {
+      throw redirect({
+        to: '/login',
+        search: { redirect: location.href },
+      });
+    }
+  },
+});
+
+// --- Payment return pages ---
+//
+// Las URLs `/payment/success`, `/payment/failure`, `/payment/pending` están
+// configuradas en `backend/.env` como `MERCADOPAGO_*_URL` y MP redirige
+// con query params (`?collection_id=...&external_reference=<orderId>...`).
+// Las páginas leen el `external_reference` con `useLocation().searchStr`.
+//
+// `/payment/manual/$orderId` es navegación interna desde el checkout
+// cuando el método es Yape/Plin/Transferencia.
+const paymentSuccessRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: '/payment/success',
+  component: PaymentSuccessPage,
+});
+
+const paymentPendingRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: '/payment/pending',
+  component: PaymentPendingPage,
+});
+
+const paymentFailureRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: '/payment/failure',
+  component: PaymentFailurePage,
+});
+
+const paymentManualRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: '/payment/manual/$orderId',
+  component: PaymentManualPage,
+});
+
 // --- Public auth pages (login/register/forgot/reset) — redirect to home if already authed ---
 //
 // El `beforeLoad` solo redirige si ya hay /me cacheado (sesión activa). No
@@ -178,6 +242,11 @@ export const routeTree = rootRoute.addChildren([
     productsListRoute,
     productDetailRoute,
     accountLayoutRoute.addChildren([accountIndexRoute, accountAddressesRoute]),
+    checkoutRoute,
+    paymentSuccessRoute,
+    paymentPendingRoute,
+    paymentFailureRoute,
+    paymentManualRoute,
   ]),
   publicAuthLayoutRoute.addChildren([
     loginRoute,

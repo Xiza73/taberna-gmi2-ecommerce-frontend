@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import {
   Sheet,
@@ -6,6 +7,7 @@ import {
   SheetFooter,
   SheetHeader,
 } from '@/components/ui/Sheet';
+import { buildLoginSearch } from '@/features/auth';
 import { useAnonymousCartStore } from '../store/anonymousCartStore';
 import { useCartUiStore } from '../store/cartUiStore';
 import { useCart } from '../hooks/useCart';
@@ -22,6 +24,7 @@ import { EmptyCart } from './EmptyCart';
  * Para items anónimos, sí lo tenemos snapshot en el store local.
  */
 export function CartDrawer() {
+  const navigate = useNavigate();
   const isOpen = useCartUiStore((s) => s.isDrawerOpen);
   const setOpen = useCartUiStore((s) => s.setDrawerOpen);
   const closeDrawer = useCartUiStore((s) => s.closeDrawer);
@@ -35,8 +38,19 @@ export function CartDrawer() {
   );
 
   function handleCheckout() {
-    // Checkout va en su propio PR. Por ahora solo aviso visual.
-    toast.message('El checkout estará disponible próximamente.');
+    if (items.length === 0) {
+      toast.error('Tu carrito está vacío.');
+      return;
+    }
+    closeDrawer();
+    if (!isAuthenticated) {
+      void navigate({
+        to: '/login',
+        search: buildLoginSearch({ redirect: '/checkout' }),
+      });
+      return;
+    }
+    void navigate({ to: '/checkout' });
   }
 
   return (
