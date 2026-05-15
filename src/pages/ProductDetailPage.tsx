@@ -17,6 +17,7 @@ import {
   useProduct,
 } from '@/features/catalog';
 import { useCart, useCartUiStore } from '@/features/cart';
+import { ReviewsList } from '@/features/reviews';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
@@ -210,6 +211,9 @@ export function ProductDetailPage() {
           </ul>
         </div>
       </div>
+
+      {/* Reviews */}
+      <ReviewsList productId={product.id} />
 
       {/* Related */}
       <RelatedProducts
