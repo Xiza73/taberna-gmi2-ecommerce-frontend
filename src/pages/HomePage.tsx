@@ -1,4 +1,5 @@
 import { Sparkles } from 'lucide-react';
+import { useSeo } from '@/hooks/useSeo';
 
 /**
  * Homepage placeholder. Vive dentro del `MainLayout` (header + footer).
@@ -6,8 +7,10 @@ import { Sparkles } from 'lucide-react';
  * products grid, newsletter) en PRs siguientes.
  */
 export function HomePage() {
+  const seo = useSeo({ type: 'website' });
   return (
     <main className="mx-auto max-w-[1400px] px-4 lg:px-8 py-16 lg:py-24">
+      {seo}
       <div className="max-w-md mx-auto text-center space-y-6">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
           <Sparkles size={28} className="text-primary" />

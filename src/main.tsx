@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { HelmetProvider } from 'react-helmet-async';
 import { routeTree } from './router/routeTree';
 import './styles/index.css';
 
@@ -48,11 +49,13 @@ function MaybeGoogleProvider({ children }: { children: ReactNode }) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <MaybeGoogleProvider>
-        <RouterProvider router={router} />
-      </MaybeGoogleProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <MaybeGoogleProvider>
+          <RouterProvider router={router} />
+        </MaybeGoogleProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </HelmetProvider>
   </StrictMode>,
 );
