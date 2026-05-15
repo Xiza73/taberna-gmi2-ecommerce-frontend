@@ -10,6 +10,7 @@ import {
   useCategories,
   useProducts,
 } from '@/features/catalog';
+import { useSeo } from '@/hooks/useSeo';
 import type { Category } from '@/types/category';
 import type { ProductSortBy, ProductsQuery } from '@/types/product';
 
@@ -91,12 +92,21 @@ export function ProductsListPage() {
     sortBy: filters.sortBy,
   };
 
-  const { data, isLoading, isFetching, isError, error } = useProducts(productsQuery);
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+    isRefetching,
+  } = useProducts(productsQuery);
   const {
     data: categoriesData,
     topLevel: topCategories,
     isLoading: isCategoriesLoading,
   } = useCategories();
+  const seo = useSeo({ title: 'Catálogo — Lumière' });
 
   const categoriesById = useMemo(() => {
     const m = new Map<string, Category>();
@@ -107,6 +117,7 @@ export function ProductsListPage() {
 
   return (
     <main className="mx-auto max-w-[1400px] px-4 lg:px-8 py-10 lg:py-14">
+      {seo}
       <header className="mb-8 lg:mb-10">
         <h1
           className="text-3xl lg:text-4xl mb-2"
@@ -142,13 +153,23 @@ export function ProductsListPage() {
       </div>
 
       {isError ? (
-        <div className="rounded-md border border-destructive/30 bg-destructive/5 p-6">
-          <p className="text-sm text-destructive">
-            No se pudieron cargar los productos.
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {error instanceof Error ? error.message : 'Error desconocido'}
-          </p>
+        <div className="rounded-md border border-destructive/30 bg-destructive/5 p-6 flex flex-col gap-3">
+          <div>
+            <p className="text-sm text-destructive">
+              No se pudieron cargar los productos.
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {error instanceof Error ? error.message : 'Error desconocido'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isRefetching}
+            className="self-start rounded-md border border-border bg-background px-3 py-1.5 text-xs hover:bg-muted transition-colors disabled:opacity-60"
+          >
+            {isRefetching ? 'Reintentando…' : 'Reintentar'}
+          </button>
         </div>
       ) : (
         <ProductGrid
