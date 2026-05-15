@@ -16,6 +16,10 @@ import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
 import { ProductsListPage } from '@/pages/ProductsListPage';
 import { ProductDetailPage } from '@/pages/ProductDetailPage';
 import { AccountAddressesPage } from '@/pages/AccountAddressesPage';
+import { AccountProfilePage } from '@/pages/AccountProfilePage';
+import { WishlistPage } from '@/pages/WishlistPage';
+import { OrdersListPage } from '@/pages/OrdersListPage';
+import { OrderDetailPage } from '@/pages/OrderDetailPage';
 import { CheckoutPage } from '@/pages/CheckoutPage';
 import { PaymentSuccessPage } from '@/pages/PaymentSuccessPage';
 import { PaymentPendingPage } from '@/pages/PaymentPendingPage';
@@ -130,6 +134,58 @@ const accountAddressesRoute = createRoute({
   component: AccountAddressesPage,
 });
 
+const accountProfileRoute = createRoute({
+  getParentRoute: () => accountLayoutRoute,
+  path: '/account/profile',
+  component: AccountProfilePage,
+});
+
+const wishlistRoute = createRoute({
+  getParentRoute: () => accountLayoutRoute,
+  path: '/account/wishlist',
+  component: WishlistPage,
+});
+
+const VALID_ORDER_STATUS = [
+  'pending',
+  'paid',
+  'processing',
+  'shipped',
+  'delivered',
+  'cancelled',
+  'refunded',
+] as const;
+
+const ordersListRoute = createRoute({
+  getParentRoute: () => accountLayoutRoute,
+  path: '/account/orders',
+  component: OrdersListPage,
+  // El parser real corre dentro de la page (`useLocation().searchStr`) —
+  // mismo patrón que `productsListRoute`. Acá solo declaramos el shape
+  // para que los `<Link to="/account/orders" search={…}>` typechequen.
+  validateSearch: (search: Record<string, unknown>) => {
+    const statusRaw = search.status;
+    const pageRaw = search.page;
+    return {
+      status:
+        typeof statusRaw === 'string' &&
+        (VALID_ORDER_STATUS as readonly string[]).includes(statusRaw)
+          ? (statusRaw as (typeof VALID_ORDER_STATUS)[number])
+          : undefined,
+      page:
+        typeof pageRaw === 'number' && pageRaw > 0
+          ? Math.floor(pageRaw)
+          : undefined,
+    };
+  },
+});
+
+const orderDetailRoute = createRoute({
+  getParentRoute: () => accountLayoutRoute,
+  path: '/account/orders/$orderId',
+  component: OrderDetailPage,
+});
+
 // --- Checkout (auth required + cart no vacío validado en la page) ---
 //
 // Reusamos el mismo patrón del accountLayoutRoute: ensureQueryData(/me) y
@@ -241,7 +297,14 @@ export const routeTree = rootRoute.addChildren([
     homeRoute,
     productsListRoute,
     productDetailRoute,
-    accountLayoutRoute.addChildren([accountIndexRoute, accountAddressesRoute]),
+    accountLayoutRoute.addChildren([
+      accountIndexRoute,
+      accountAddressesRoute,
+      accountProfileRoute,
+      wishlistRoute,
+      ordersListRoute,
+      orderDetailRoute,
+    ]),
     checkoutRoute,
     paymentSuccessRoute,
     paymentPendingRoute,

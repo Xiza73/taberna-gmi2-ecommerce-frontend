@@ -15,7 +15,7 @@ import { cn } from '@/utils/cn';
  * personal del customer + Outlet a la derecha. Vive dentro del MainLayout
  * (header/footer siguen visibles).
  *
- * Items disabled hoy: Perfil, Mis pedidos, Wishlist (vienen en sus PRs).
+ * Todos los items están habilitados.
  */
 
 interface NavItem {
@@ -27,10 +27,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'orders', label: 'Mis pedidos', icon: Package, disabled: true },
+  { id: 'orders', label: 'Mis pedidos', icon: Package, to: '/account/orders' },
   { id: 'addresses', label: 'Mis direcciones', icon: MapPin, to: '/account/addresses' },
-  { id: 'wishlist', label: 'Wishlist', icon: Heart, disabled: true },
-  { id: 'profile', label: 'Perfil', icon: User, disabled: true },
+  { id: 'wishlist', label: 'Wishlist', icon: Heart, to: '/account/wishlist' },
+  { id: 'profile', label: 'Perfil', icon: User, to: '/account/profile' },
 ];
 
 export function AccountLayout() {
