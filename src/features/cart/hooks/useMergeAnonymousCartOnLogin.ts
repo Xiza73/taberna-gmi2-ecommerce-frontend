@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { cartApi } from '@/api/cartApi';
 import { useAuth } from '@/features/auth';
 import { useAnonymousCartStore } from '../store/anonymousCartStore';
@@ -50,7 +51,31 @@ export function useMergeAnonymousCartOnLogin() {
           cartApi.addItem({ productId: i.productId, quantity: i.quantity }),
         ),
       );
-      // Si al menos uno succeeded, limpiamos el local y refrescamos.
+      const failed: { item: (typeof items)[number]; reason: unknown }[] = [];
+      results.forEach((r, idx) => {
+        if (r.status === 'rejected') {
+          const item = items[idx];
+          if (item) failed.push({ item, reason: r.reason });
+        }
+      });
+
+      if (failed.length > 0) {
+        console.warn(
+          '[cart-merge] failed items',
+          failed.map(({ item, reason }) => ({
+            productId: item.productId,
+            name: item.productName,
+            reason,
+          })),
+        );
+        toast.message('Algunos productos no se agregaron', {
+          description:
+            failed.length === 1
+              ? '1 producto del carrito guardado ya no está disponible.'
+              : `${failed.length} productos del carrito guardado ya no están disponibles.`,
+        });
+      }
+
       const anySuccess = results.some((r) => r.status === 'fulfilled');
       if (anySuccess) {
         clearLocal();
