@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ImageOff } from 'lucide-react';
 import type { Product } from '@/types/product';
 import type { Category } from '@/types/category';
+import { WishlistHeartButton } from '@/features/wishlist';
 import { formatPEN } from '@/utils/format';
 import { cn } from '@/utils/cn';
 
@@ -53,6 +54,12 @@ export function ProductCard({ product, categoriesById, index = 0 }: Props) {
               <Badge tone="accent">¡Últimas unidades!</Badge>
             )}
             {product.stock === 0 && <Badge tone="muted">Agotado</Badge>}
+          </div>
+
+          {/* Wishlist heart — top-right, encima de la imagen. Hace
+              stopPropagation para no disparar el Link al detalle. */}
+          <div className="absolute top-3 right-3">
+            <WishlistHeartButton productId={product.id} />
           </div>
         </div>
 
