@@ -113,6 +113,19 @@ definidas en la raíz, no se copia el código del Figma tal cual.
 - **Google Sign-In** (cliente): usamos el cliente JS de Google con `VITE_GOOGLE_CLIENT_ID`.
   El front obtiene `idToken` y lo manda a `/auth/google`. El back verifica.
 
+### MercadoPago — edge cases a tener en cuenta
+
+| Caso | Qué pasa hoy | Recovery |
+|---|---|---|
+| Customer cierra pestaña entre `POST /orders` y redirect a MP | Orden queda `pending`. Webhook no llega porque nunca completó el pago. | Cron del back expira la orden en ~2hs y restaura stock. Customer puede crear otra orden. |
+| Webhook llega antes que el redirect a `/payment/success` | Caso normal — al volver, la orden ya está `paid`. | No requiere acción. La página success llama `verify-payment` como idempotent fallback. |
+| `verify-payment` falla en `/payment/success` | El customer ve loading → error inline. | Refresh manual de la página reintenta. Si persiste, staff verifica desde backoffice. |
+| Webhook nunca llega (MP cae o ngrok caído en dev) | Orden queda `pending` indefinidamente. | Cron expira a las `ORDER_EXPIRATION_HOURS` (default 2hs). Customer puede retry desde "Mis pedidos". |
+| Pago aprobado pero monto diferente al de la orden (raro) | Webhook handler en back loguea alerta y NO marca la orden como paid. | Staff revisa manualmente — el panel admin muestra estos pagos en limbo. |
+| Customer paga con efectivo en agente (PagoEfectivo) | MP devuelve status `pending`. Redirect cae en `/payment/pending`. | Customer ve instrucciones. Cuando paga, MP manda webhook con `approved`. |
+
+> **Nota**: el storefront NO debe permitir al customer marcar manualmente una orden como pagada. Ese flow es solo backoffice (admin).
+
 ---
 
 ## Variables de entorno
